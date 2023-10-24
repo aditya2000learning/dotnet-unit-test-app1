@@ -44,18 +44,11 @@ stages:
           inputs:
             command: 'test'
             projects: '**/*Tests/*.csproj'
-            arguments: '--no-restore --configuration $(buildConfiguration)'
+            arguments: '--configuration $(buildConfiguration) --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura'
+            publishTestResults: true
 
-        - task: DotNetCoreCLI@2
-          displayName: 'Dotnet Publish'
+        - task: PublishCodeCoverageResults@1
+          displayName: 'Publish code coverage report'
           inputs:
-            command: 'publish'
-            publishWebProjects: true
-            arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-        
-        - task: PublishPipelineArtifact@1
-          displayName: 'Publish Artifacts'
-          inputs:
-            targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifact: 'artifacts'
-            publishLocation: 'pipeline'
+            codeCoverageTool: 'Cobertura'
+            summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
